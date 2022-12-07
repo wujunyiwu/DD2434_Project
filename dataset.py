@@ -9,19 +9,77 @@ from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 from torchvision.datasets import CelebA
 import zipfile
+import torchvision
 
 
 # Add your custom dataset class here
-class MyDataset(Dataset):
-    def __init__(self):
-        pass
+class MyDataset(LightningDataModule):
+    """
+    PyTorch Lightning data module 
+
+    Args:
+        data_dir: root directory of your dataset.
+        train_batch_size: the batch size to use during training.
+        val_batch_size: the batch size to use during validation.
+        num_workers: the number of parallel workers to create to load data
+            items (see PyTorch's Dataloader documentation for more details).
+        pin_memory: whether prepared items should be loaded into pinned memory
+            or not. This can improve performance on GPUs.
+    """
+
+    def __init__(
+        self,
+        data_path: str,
+        train_batch_size: int = 8,
+        val_batch_size: int = 8,
+        num_workers: int = 0,
+        pin_memory: bool = False,
+        **kwargs,
+    ):
+        super().__init__()
+
+        self.data_dir = data_path
+        self.train_batch_size = train_batch_size
+        self.val_batch_size = val_batch_size
+        self.num_workers = num_workers
+        self.pin_memory = pin_memory
+
+    def setup(self, stage: Optional[str] = None) -> None:
+        transform = transforms.Compose([
+                           transforms.ToTensor(),
+                        #    transforms.Normalize((0.1307,), (0.3081,))
+                       ])
+
+        self.train_dataset = torchvision.datasets.MNIST('./Data/', train=True, transform=transform, download=True)
+        self.test_dataset = torchvision.datasets.MNIST('./Data/', train=False, transform=transform, download=True)
+        self.train_dataset, self.val_dataset = torch.utils.data.random_split(self.train_dataset, [55000, 5000])
+        
+    def train_dataloader(self) -> DataLoader:
+        return DataLoader(
+            self.train_dataset,
+            batch_size=self.train_batch_size,
+            num_workers=self.num_workers,
+            shuffle=True,
+            pin_memory=self.pin_memory,
+        )
+
+    def val_dataloader(self) -> Union[DataLoader, List[DataLoader]]:
+        return DataLoader(
+            self.val_dataset,
+            batch_size=self.val_batch_size,
+            num_workers=self.num_workers,
+            shuffle=False,
+            pin_memory=self.pin_memory,
+        )
     
-    
-    def __len__(self):
-        pass
-    
-    def __getitem__(self, idx):
-        pass
+    def test_dataloader(self) -> Union[DataLoader, List[DataLoader]]:
+        return DataLoader(
+            self.val_dataset,
+            batch_size=144,
+            num_workers=self.num_workers,
+            shuffle=True,
+            pin_memory=self.pin_memory,
+        )
 
 
 class MyCelebA(CelebA):
