@@ -12,15 +12,20 @@ class IWAE(BaseVAE):
                  latent_dim: int,
                  hidden_dims: List = None,
                  num_samples: int = 5,
+                 dataset: str = None,
                  **kwargs) -> None:
         super(IWAE, self).__init__()
 
         self.latent_dim = latent_dim
         self.num_samples = num_samples
+        self.dataset = dataset
 
         modules = []
         if hidden_dims is None:
-            hidden_dims = [32, 64, 128, 256, 512]
+            if dataset == "celeba":
+                hidden_dims = [32, 64, 128, 256, 512]  # for celeba
+            elif dataset == "MNIST":
+                hidden_dims = [32, 64]  # for MNIST
 
         # Build Encoder
         for h_dim in hidden_dims:
@@ -34,14 +39,19 @@ class IWAE(BaseVAE):
             in_channels = h_dim
 
         self.encoder = nn.Sequential(*modules)
-        self.fc_mu = nn.Linear(hidden_dims[-1]*4, latent_dim)
-        self.fc_var = nn.Linear(hidden_dims[-1]*4, latent_dim)
-
+        if dataset == "celeba":
+            self.fc_mu = nn.Linear(hidden_dims[-1]*4, latent_dim)  # for celeba
+            self.fc_var = nn.Linear(hidden_dims[-1]*4, latent_dim)  # for celeba
+        elif dataset == "MNIST":
+            self.fc_mu = nn.Linear(hidden_dims[-1]*49, latent_dim)  # for MNIST
+            self.fc_var = nn.Linear(hidden_dims[-1]*49, latent_dim)  # for MNIST
 
         # Build Decoder
         modules = []
-
-        self.decoder_input = nn.Linear(latent_dim, hidden_dims[-1] * 4)
+        if dataset == "celeba":
+            self.decoder_input = nn.Linear(latent_dim, hidden_dims[-1]*4)  # for celeba
+        elif dataset == "MNIST":
+            self.decoder_input = nn.Linear(latent_dim, hidden_dims[-1]*49)  # for MNIST
 
         hidden_dims.reverse()
 
@@ -102,7 +112,10 @@ class IWAE(BaseVAE):
         B, _, _ = z.size()
         z = z.reshape(-1, self.latent_dim) #[BS x D]
         result = self.decoder_input(z)
-        result = result.view(-1, 512, 2, 2)
+        if self.dataset == "celeba":
+            result = result.view(-1, 512, 2, 2)  # for celeba
+        elif self.dataset == "MNIST":
+            result = result.view(-1, 64, 7, 7)  # for MNIST
         result = self.decoder(result)
         result = self.final_layer(result) #[BS x C x H x W ]
         result = result.view([B, -1, result.size(1), result.size(2), result.size(3)]) #[B x S x C x H x W]
