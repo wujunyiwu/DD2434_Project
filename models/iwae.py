@@ -100,7 +100,7 @@ class IWAE(BaseVAE):
         :return: (Tensor) [B x S x C x H x W]
         """
         B, _, _ = z.size()
-        z = z.view(-1, self.latent_dim) #[BS x D]
+        z = z.reshape(-1, self.latent_dim) #[BS x D]
         result = self.decoder_input(z)
         result = result.view(-1, 512, 2, 2)
         result = self.decoder(result)
