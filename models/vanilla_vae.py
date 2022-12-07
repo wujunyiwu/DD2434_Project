@@ -65,10 +65,11 @@ class VanillaVAE(BaseVAE):
                     nn.LeakyReLU())
             )
 
-
-
         self.decoder = nn.Sequential(*modules)
-
+        if self.dataset == "celeba":
+            out_channels = 3
+        elif self.dataset == 'MNIST':
+            out_channels = 1
         self.final_layer = nn.Sequential(
                             nn.ConvTranspose2d(hidden_dims[-1],
                                                hidden_dims[-1],
@@ -78,7 +79,7 @@ class VanillaVAE(BaseVAE):
                                                output_padding=1),
                             nn.BatchNorm2d(hidden_dims[-1]),
                             nn.LeakyReLU(),
-                            nn.Conv2d(hidden_dims[-1], out_channels= 3,
+                            nn.Conv2d(hidden_dims[-1], out_channels=out_channels,
                                       kernel_size= 3, padding= 1),
                             nn.Tanh())
 
