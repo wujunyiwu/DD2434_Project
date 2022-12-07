@@ -1,15 +1,32 @@
 model_params:
   name: 'IWAE'
-  in_channels: 3
-  latent_dim: 128
+  # dataset: "MNIST"
+  # in_channels: 1  # for MNIST
+  # latent_dim: 20  # for MNIST
+  dataset: "celeba"
+  in_channels: 3  # for celeba
+  latent_dim: 128  # for celeba
   num_samples: 5
 
-data_params:
+
+data_set:
+  # name: "MNIST"
+  name: "celeba"
+
+
+data_params_MNIST:
+  data_path: "Data/"
+  train_batch_size: 250
+  val_batch_size: 250
+  num_workers: 0
+
+
+data_params_celeba:
   data_path: "Data/"
   train_batch_size: 64
-  val_batch_size:  64
+  val_batch_size: 64
   patch_size: 64
-  num_workers: 4
+  num_workers: 0
 
 
 exp_params:
@@ -20,7 +37,7 @@ exp_params:
   manual_seed: 1265
 
 trainer_params:
-  gpus: [1]
+  gpus: []
   max_epochs: 10
 
 logging_params:
