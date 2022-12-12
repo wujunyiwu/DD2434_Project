@@ -6,6 +6,7 @@ from .types_ import *
 
 
 class VanillaVAE(BaseVAE):
+    
     def __init__(self,
                  in_channels: int,
                  latent_dim: int,

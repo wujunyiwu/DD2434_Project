@@ -6,7 +6,7 @@ model_params:
   dataset: "celeba"
   in_channels: 3  # for celeba
   latent_dim: 128  # for celeba
-  num_samples: 5
+  num_samples: 5  # parameter "k" in the paper
 
 
 data_set:
