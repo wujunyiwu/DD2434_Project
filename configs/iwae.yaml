@@ -1,17 +1,17 @@
 model_params:
   name: 'IWAE'
-  # dataset: "MNIST"
-  # in_channels: 1  # for MNIST
-  # latent_dim: 20  # for MNIST
-  dataset: "celeba"
-  in_channels: 3  # for celeba
-  latent_dim: 128  # for celeba
+  dataset: "MNIST"
+  in_channels: 1  # for MNIST
+  latent_dim: 20  # for MNIST
+  # dataset: "celeba"
+  # in_channels: 3  # for celeba
+  # latent_dim: 128  # for celeba
   num_samples: 5  # parameter "k" in the paper
 
 
 data_set:
-  # name: "MNIST"
-  name: "celeba"
+  name: "MNIST"
+  # name: "celeba"
 
 
 data_params_MNIST:

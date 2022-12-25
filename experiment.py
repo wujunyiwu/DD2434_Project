@@ -86,8 +86,19 @@ class VAEXperiment(pl.LightningModule):
                                            f"{self.logger.name}_Epoch_{self.current_epoch}.png"),
                               normalize=True,
                               nrow=12)
-        except Warning:
-            pass
+        except:
+            samples = self.model.sample(144,
+                                        self.curr_device,
+                                        labels = test_label)
+            samples.cpu().data = samples.cpu().data.unsqueeze(1)  # for MNIST
+            print(samples.cpu().data.shape)
+            vutils.save_image(samples.cpu().data,
+                              os.path.join(self.logger.log_dir , 
+                                           "Samples",      
+                                           f"{self.logger.name}_Epoch_{self.current_epoch}.png"),
+                              normalize=True,
+                              nrow=12)
+
 
     def configure_optimizers(self):
 
